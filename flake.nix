@@ -97,7 +97,6 @@
                 {
                   name = "✓ Install cachix";
                   uses = "cachix/cachix-action@v16";
-                  "if" = "github.ref_type != 'tag'";
                   "with" = {
                     name = "njk";
                     extraPullNames = "nix-community, njk";
@@ -139,7 +138,6 @@
                     limit-access-to-actor = true;
                   };
                 }
-
               ];
             };
           };
