@@ -1,0 +1,31 @@
+name: dkeygen
+version: 0.0.1
+license: MIT
+crystal: ">= 1.16.3"
+
+authors:
+- voobscout <1203212+voobscout@users.noreply.github.com>
+
+dependencies:
+  progress_bar.cr:
+    github: tpei/progress_bar.cr
+    branch: master
+  tallboy:
+    github: epoch/tallboy
+  cling:
+    github: devnote-dev/cling
+    branch: main
+  ed25519:
+    github: spider-gazelle/ed25519
+    branch: master
+  cronic:
+    github: voobscout/cronic
+    branch: master
+
+# development_dependencies:
+#   ameba:
+#     github: veelenga/ameba
+
+targets:
+  dkeygen:
+    main: src/dkeygen.cr

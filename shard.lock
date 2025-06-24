@@ -1,0 +1,26 @@
+version: 2.0
+shards:
+  cling:
+    git: https://github.com/devnote-dev/cling.git
+    version: 3.0.0+git.commit.3cd8b0baebb4b887b48a374f7e3f0887699fa4e5
+
+  cronic:
+    git: https://github.com/voobscout/cronic.git
+    version: 0.1.0+git.commit.5d17c14fb084bd13586cbdc9bfbf838c5e414da6
+
+  ed25519:
+    git: https://github.com/spider-gazelle/ed25519.git
+    version: 1.0.3+git.commit.48b3b2a73a54426d62be7a04b75d2da5abad80f0
+
+  number_parser:
+    git: https://github.com/voobscout/number_parser.git
+    version: 0.1.0+git.commit.549afd681cc5cb2e16e21dcc8106efde6cf9c547
+
+  progress_bar.cr:
+    git: https://github.com/tpei/progress_bar.cr.git
+    version: 0.3.1+git.commit.c6be630a1883bb12e61f537b38f30945ae795d5d
+
+  tallboy:
+    git: https://github.com/epoch/tallboy.git
+    version: 0.9.3
+

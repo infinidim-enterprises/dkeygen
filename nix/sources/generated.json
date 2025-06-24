@@ -1,0 +1,68 @@
+{
+    "bip39key": {
+        "cargoLocks": {
+            "Cargo.lock": [
+                "./bip39key-4e14c1c29d2ca20cbddc4df53fc378f4d9c98797/Cargo.lock",
+                {}
+            ]
+        },
+        "date": "2025-05-30",
+        "extract": null,
+        "name": "bip39key",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "4e14c1c29d2ca20cbddc4df53fc378f4d9c98797",
+            "sha256": "sha256-41p+FF3LlntHAXqF+12zxVVXVZdEzIOMef55CbUY3pY=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/voobscout/bip39key"
+        },
+        "version": "4e14c1c29d2ca20cbddc4df53fc378f4d9c98797"
+    },
+    "crystal2nix": {
+        "cargoLocks": null,
+        "date": "2025-06-22",
+        "extract": null,
+        "name": "crystal2nix",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "rev": "1d2357653ed79cd5d0d231ef88b9f4943c5b6ec1",
+            "sha256": "sha256-+fMxexyIGEoXEFr3E6DWLzaA3VeaOfCgA+Wu1ovvQ00=",
+            "sparseCheckout": [],
+            "type": "git",
+            "url": "https://github.com/voobscout/crystal2nix"
+        },
+        "version": "1d2357653ed79cd5d0d231ef88b9f4943c5b6ec1"
+    },
+    "crystalline": {
+        "cargoLocks": null,
+        "date": null,
+        "extract": null,
+        "name": "crystalline",
+        "passthru": null,
+        "pinned": false,
+        "src": {
+            "deepClone": false,
+            "fetchSubmodules": false,
+            "leaveDotGit": false,
+            "name": null,
+            "owner": "elbywan",
+            "repo": "crystalline",
+            "rev": "v0.17.1",
+            "sha256": "sha256-SIfInDY6KhEwEPZckgobOrpKXBDDd0KhQt/IjdGBhWo=",
+            "sparseCheckout": [],
+            "type": "github"
+        },
+        "version": "v0.17.1"
+    }
+}

@@ -1,0 +1,38 @@
+#+html: <a href="https://github.com/infinidim-enterprises/dkeygen/actions/workflows/release.yaml"><img src="https://img.shields.io/github/actions/workflow/status/infinidim-enterprises/dkeygen/release.yaml?event=push&logo=nixos&logoColor=white&label=Release"/></a>&nbsp;
+#+html: <a href="https://github.com/infinidim-enterprises/dkeygen/issues"><img src="https://img.shields.io/github/issues/infinidim-enterprises/dkeygen"></a>&nbsp;
+#+html: <a href="https://github.com/infinidim-enterprises/dkeygen"><img src="https://img.shields.io/github/repo-size/infinidim-enterprises/dkeygen"></a>&nbsp;
+#+html: <a href="https://github.com/infinidim-enterprises/dkeygen/stargazers"><img src="https://img.shields.io/github/stars/infinidim-enterprises/dkeygen"></a>&nbsp;
+
+* Usage
+:PROPERTIES:
+:ID:       4665a770-2464-41da-8d3d-b63ae34ad698
+:END:
+** Requirements
+:PROPERTIES:
+:ID:       c11f2e31-f71f-42f2-860a-94af1a8771e0
+:END:
+Expected binaries on PATH:
+- [[https://github.com/Yubico/yubikey-manager][yubikey-manager]] (ykman)
+- [[https://github.com/systemd/systemd][systemd]] (systemctl)
+- [[https://github.com/voobscout/bip39key][bip39key]] (specific version, until [[https://github.com/jpdarago/bip39key/pull/13][PR13]] merged)
+- [[https://gnupg.org][gnupg]] (gpg and gpgconf)
+- [[https://www.openssh.com/][openssh]] (ssh-add)
+** Example
+:PROPERTIES:
+:ID:       c3535df0-f1c7-4387-a106-9ada05000b9d
+:END:
+Have a yubikey inserted.
+#+begin_src bash
+nix run "github:infinidim-enterprises/dkeygen#dkeygen" -- dump /path/to/private/key.asc
+#+end_src
+* TODO
+:PROPERTIES:
+:ID:       43fc3bb0-cbe4-4a06-9287-a2509291df51
+:END:
+- sort out overlays.default
+- nitrokey support
+* Remarks
+:PROPERTIES:
+:ID:       d5da8ae9-de21-466a-a084-32b598fbc289
+:END:
+GnuPG sucks donkey balls, unfortunately there are no alternatives.

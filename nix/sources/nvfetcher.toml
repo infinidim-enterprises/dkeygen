@@ -1,0 +1,14 @@
+[crystalline]
+src.use_latest_tag = true
+src.github = "elbywan/crystalline"
+fetch.github = "elbywan/crystalline"
+
+[crystal2nix]
+src.git = "https://github.com/voobscout/crystal2nix"
+src.branch = "fix_shard_names_with_dots"
+fetch.git = "https://github.com/voobscout/crystal2nix"
+
+[bip39key]
+cargo_locks = [ "Cargo.lock" ]
+src.git = "https://github.com/voobscout/bip39key"
+fetch.git = "https://github.com/voobscout/bip39key"
