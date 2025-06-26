@@ -1,8 +1,15 @@
+#+title: dkeygen - ed25519 pgp keys from BIP39 mnemonic dumped to hardware token
 #+html: <a href="https://github.com/infinidim-enterprises/dkeygen/actions/workflows/release.yaml"><img src="https://img.shields.io/github/actions/workflow/status/infinidim-enterprises/dkeygen/release.yaml?event=push&logo=nixos&logoColor=white&label=Release"/></a>&nbsp;
 #+html: <a href="https://github.com/infinidim-enterprises/dkeygen/issues"><img src="https://img.shields.io/github/issues/infinidim-enterprises/dkeygen"></a>&nbsp;
 #+html: <a href="https://github.com/infinidim-enterprises/dkeygen"><img src="https://img.shields.io/github/repo-size/infinidim-enterprises/dkeygen"></a>&nbsp;
 #+html: <a href="https://github.com/infinidim-enterprises/dkeygen/stargazers"><img src="https://img.shields.io/github/stars/infinidim-enterprises/dkeygen"></a>&nbsp;
 
+* Disclaimer
+:PROPERTIES:
+:ID:       650a0770-4133-4709-bf72-30fee53b1172
+:END:
+This software makes no guarantees of any kind at all.
+It was made to run on air-gapped machines, booted from a read-only media.
 * Usage
 :PROPERTIES:
 :ID:       4665a770-2464-41da-8d3d-b63ae34ad698
@@ -35,4 +42,4 @@ nix run "github:infinidim-enterprises/dkeygen#dkeygen" -- dump /path/to/private/
 :PROPERTIES:
 :ID:       d5da8ae9-de21-466a-a084-32b598fbc289
 :END:
-GnuPG sucks donkey balls, unfortunately there are no alternatives.
+GnuPG sucks donkey balls - unfortunately there are no alternatives.

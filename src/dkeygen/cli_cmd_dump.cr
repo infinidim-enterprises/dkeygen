@@ -8,42 +8,36 @@ module Dkeygen
     include CliCommonLogic
     Log = ::Log.for(self)
 
-    @gpg_interactions : GpgExpectConfig
-    @gpg_config : GpgHomeConfig
-    @key_config : KeyConfig
-    @env_vars : Hash(String, String)
-    @gpg_agent : GpgAgent
-    @outdir : String
-    @report : Report
-    @pb : ProgressBar?
+    property gpg_interactions : GpgExpectConfig = GpgExpectConfig.from_yaml {{ read_file("#{__DIR__}/../resources/config_gpg_expect.yml") }}
+    property gpg_config : GpgHomeConfig = GpgHomeConfig.from_yaml {{ read_file("#{__DIR__}/../resources/config_gnupg_home.yml") }}
+    property key_config : KeyConfig = KeyConfig.from_yaml {{ read_file("#{__DIR__}/../resources/config_key.yml") }}
+    property env_vars : Hash(String, String) = ENV.to_h
+    property gpg_agent : GpgAgent
+    property working_dir : Tempdir = Tempdir.new
+    property outdir : String
+    property report : Report = Report.new
+    property pb : ProgressBar? = nil
+    property gpg : String? = Process.find_executable "gpg"
+    property gpgconf : String? = Process.find_executable "gpgconf"
+    property ssh_add : String? = Process.find_executable "ssh-add"
+    property ykman : String? = Process.find_executable "ykman"
+    property bip39key : String? = Process.find_executable "bip39key"
+    property systemctl : String? = Process.find_executable "systemctl"
 
     def initialize(**args)
       super(**args)
-      @gpg_interactions = GpgExpectConfig.from_yaml {{ read_file("#{__DIR__}/../resources/config_gpg_expect.yml") }}
-      @gpg_config = GpgHomeConfig.from_yaml {{ read_file("#{__DIR__}/../resources/config_gnupg_home.yml") }}
-      @key_config = KeyConfig.from_yaml {{ read_file("#{__DIR__}/../resources/config_key.yml") }}
-      @working_dir = Tempdir.new
       @gnupghome = @working_dir / "gnupghome"
-      @env_vars = ENV.to_h
       @env_vars["GNUPGHOME"] = "#{@gnupghome}"
       @gpg_agent = GpgAgent.new(@env_vars)
       @outdir = uninitialized String
       @gpg_key = uninitialized GpgKey
-      @report = Report.new
-      @pb = nil
     end
 
     def setup : Nil
       @name = "dump"
       @description = "Dumps gpg subkeys to a hardware token"
-      @gpg = Process.find_executable "gpg"
-      @gpgconf = Process.find_executable "gpgconf"
-      @ssh_add = Process.find_executable "ssh-add"
-      @ykman = Process.find_executable "ykman"
-      @bip39key = Process.find_executable "bip39key"
-      @systemctl = Process.find_executable "systemctl"
 
-      add_argument "filename", description: "Secret key filename", required: false
+      add_argument "filename", description: "Secret key filename - will generate a new key if not provided", required: false
       add_option 'i', "interactions", description: "GnuPG interactions file in YAML format", type: :single
       add_option 'c', "config", description: "PGP key configuration in YAML format", type: :single
       add_option 'f', "force", description: "Don't confirm destructive operations", type: :none
@@ -55,19 +49,19 @@ module Dkeygen
       unless options.has? "help"
         @interactions = options.get?("interactions")
         @config = options.get?("config")
-        @key_filename = arguments.get?("filename")
+        @key_filename = arguments.get?("filename").to_s
         @outdir = options.get("outdir").to_s
 
         Dir.mkdir_p(@outdir) unless File.exists?(@outdir)
 
         gpg_interactions if @interactions
-        key_config if @config
+        custom_key_config if @config
 
         gpg_config
         binary_check
 
         if Log.level.to_i >= 2
-          @pb = ProgressBar.new(ticks: 9,
+          @pb = ProgressBar.new(ticks: 10,
             charset: :bar,
             show_percentage: true)
           @pb.try &.init
@@ -80,7 +74,7 @@ module Dkeygen
         end
 
         @gpg_agent.toggle
-        gpg_key_import
+        gpg_key_import_or_generate
         gpg_key_revcert
         gpg_key_public_export
         overrides
@@ -97,7 +91,27 @@ module Dkeygen
       true
     end
 
-    private def pb_tick(msg : String | Nil = nil)
+    private def gpg_key_exists?
+      if fname = @key_filename
+        File.exists?(fname) &&
+          File::Info.readable?(fname)
+      else
+        false
+      end
+    end
+
+    private def gpg_key_import_or_generate
+      if gpg_key_exists?
+        gpg_key_import
+      else
+        key = Bip39key.new(self)
+        @key_filename = key.key_filename
+        # exit_program(1)
+        gpg_key_import
+      end
+    end
+
+    def pb_tick(msg : String | Nil = nil)
       @pb.try &.message("#{"✓".colorize(:green)} #{msg}...") if msg
       @pb.try &.tick
     end
@@ -109,7 +123,7 @@ module Dkeygen
                                          "--delete-secret-keys",
                                          "#{@gpg_key.fingerprint}"], @env_vars) do |_|
         Log.debug { "#{"✓".colorize(:green)} gpg_key_secret_delete" }
-        pb_tick("Deleting pgp secret key")
+        pb_tick("Deleted pgp secret key")
       end
     end
 
@@ -127,7 +141,7 @@ module Dkeygen
         Log.trace { "#{output.inspect}" }
         Log.debug { "#{"✓".colorize(:green)} #{fname}" }
         @report.gpg_public_key = fname
-        pb_tick("Exporting pgp public key")
+        pb_tick("Exported pgp public key")
       end
     end
 
@@ -148,7 +162,7 @@ module Dkeygen
         Log.trace { "#{output.inspect}" }
         Log.debug { "#{"✓".colorize(:green)} #{fname}" }
         @report.ssh_public_key = fname
-        pb_tick("Creating ssh public key")
+        pb_tick("Created ssh public key")
       end
     end
 
@@ -170,7 +184,7 @@ module Dkeygen
         if res[:status].success? || res[:status].exit_code != 1
           Log.debug { "#{"✓".colorize(:green)} #{fname}" }
           @report.gpg_revcert = fname
-          pb_tick("Creating revocation certificate")
+          pb_tick("Created revocation certificate")
         else
           Log.error { "key_revcert failure" }
           exit_program(1)
@@ -178,45 +192,36 @@ module Dkeygen
       end
     end
 
-    private def refresh_gpg_state
-      sleep(Time::Span.new(seconds: 5))
-      @gpg_agent.refresh_state
-    end
-
     private def gpg_key_import
-      if @key_filename && File.exists?(@key_filename.to_s) && File::Info.readable?(@key_filename.to_s)
-        fname_key = File.expand_path(@key_filename.to_s, home: true)
-        fname_trust = @gnupghome / "trust.txt"
+      fname_key = File.expand_path(@key_filename.to_s, home: true)
+      fname_trust = @gnupghome / "trust.txt"
 
-        binary_check_and_run(@gpg, "gpg", ["--import-options",
-                                           "show-only",
-                                           "--with-colons",
-                                           "--import",
-                                           "--with-fingerprint",
-                                           fname_key], @env_vars) do |output|
-          @gpg_key = GpgKey.new(output)
-          subkeys = @gpg_key.subkeys.map { |subkey| "[#{subkey.capabilities}]#{subkey.key_id}" }
-          Log.debug { "#{"✓".colorize(:green)} #{@gpg_key.primary_key.type}: (#{@gpg_key.fingerprint}) [#{@gpg_key.primary_key.capabilities}] found." }
-          Log.trace { "#{subkeys.join(", ")}" }
-        end
-
-        File.write(fname_trust, "#{@gpg_key.fingerprint}:6:\n")
-
-        binary_check_and_run(@gpg, "gpg", ["--import", fname_key.to_s], @env_vars) do |_|
-          Log.debug { "#{"✓".colorize(:green)} #{@gpg_key.fingerprint} imported." }
-        end
-
-        binary_check_and_run(@gpg, "gpg", ["--import-ownertrust", fname_trust.to_s], @env_vars) do |_|
-          Log.debug { "#{"✓".colorize(:green)} Owner trust imported" }
-        end
-
-        Log.debug { "GNUPGHOME=#{@gnupghome}" }
-      else
-        # TODO: bip39key generate and import
+      binary_check_and_run(@gpg, "gpg", ["--import-options",
+                                         "show-only",
+                                         "--with-colons",
+                                         "--import",
+                                         "--with-fingerprint",
+                                         fname_key], @env_vars) do |output|
+        @gpg_key = GpgKey.new(output)
+        subkeys = @gpg_key.subkeys.map { |subkey| "[#{subkey.capabilities}]#{subkey.key_id}" }
+        Log.debug { "#{"✓".colorize(:green)} #{@gpg_key.primary_key.type}: (#{@gpg_key.fingerprint}) [#{@gpg_key.primary_key.capabilities}] found." }
+        Log.trace { "#{subkeys.join(", ")}" }
       end
 
+      File.write(fname_trust, "#{@gpg_key.fingerprint}:6:\n")
+
+      binary_check_and_run(@gpg, "gpg", ["--import", fname_key.to_s], @env_vars) do |_|
+        Log.debug { "#{"✓".colorize(:green)} #{@gpg_key.fingerprint} imported." }
+      end
+
+      binary_check_and_run(@gpg, "gpg", ["--import-ownertrust", fname_trust.to_s], @env_vars) do |_|
+        Log.debug { "#{"✓".colorize(:green)} Owner trust imported" }
+      end
+
+      Log.debug { "GNUPGHOME=#{@gnupghome}" }
+
       @report.gpg_key = @gpg_key
-      pb_tick("Importing secret key")
+      pb_tick("Imported secret key")
     end
 
     private def gpg_config
@@ -267,7 +272,7 @@ module Dkeygen
       end
     end
 
-    private def key_config
+    private def custom_key_config
       if config = @config
         file = File.expand_path(config.as_s)
         if File.exists?(file) && !File.empty?(file)
@@ -288,7 +293,7 @@ module Dkeygen
 
         binary_check_and_run(@ykman, "ykman", ["openpgp", "reset", "--force"], @env_vars) do |_|
           Log.debug { "#{"✓".colorize(:green)} card_reset success" }
-          pb_tick("Resetting card")
+          pb_tick("Reset card")
         end
       end
     end
@@ -301,7 +306,7 @@ module Dkeygen
         res = Expect.interactive_process @gpg.to_s, @gpg_interactions.card_set_keyattrs, @env_vars
         if res[:status].success? || res[:status].exit_code != 1
           Log.debug { "#{"✓".colorize(:green)} card_set_keyattrs success" }
-          pb_tick("Setting key attributes")
+          pb_tick("Set key attributes")
         else
           Log.error { "card_set_keyattrs failure" }
         end
@@ -316,7 +321,7 @@ module Dkeygen
         res = Expect.interactive_process @gpg.to_s, @gpg_interactions.card_set_owner, @env_vars
         if res[:status].success? || res[:status].exit_code != 1
           Log.debug { "#{"✓".colorize(:green)} card_set_owner success" }
-          pb_tick("Setting card owner information")
+          pb_tick("Set card owner information")
         else
           Log.error { "card_set_owner failure" }
         end
@@ -332,7 +337,7 @@ module Dkeygen
         res = Expect.interactive_process @gpg.to_s, @gpg_interactions.key_keytocard, @env_vars
         if res[:status].success? || res[:status].exit_code != 1
           Log.debug { "#{"✓".colorize(:green)} key_keytocard success" }
-          pb_tick("Moving subkeys to card")
+          pb_tick("Moved subkeys to card")
         else
           Log.error { "key_keytocard failure" }
         end
@@ -424,26 +429,6 @@ module Dkeygen
         systemctl_version = output.lines.first.split(" ")[1]
         Log.debug { "#{"✓".colorize(:green)} systemctl v#{systemctl_version}" }
       end
-    end
-
-    private def binary_check_and_run(binary_path : String?,
-                                     name : String,
-                                     args : Array(String),
-                                     env : Process::Env = nil,
-                                     &success_block : (String) -> Nil)
-      unless binary_path
-        Log.error { "#{name} binary not found in PATH!" }
-        exit_program(1)
-      end
-
-      Log.trace { "#{binary_path} - binary found" }
-      res = Expect.none_interactive_process binary_path.to_s, args, env
-
-      unless res[:status].success?
-        Log.error { "#{binary_path} #{args.join(" ")} - Failed to run" }
-        exit_program(1)
-      end
-      success_block.call(res[:output])
     end
   end
 end

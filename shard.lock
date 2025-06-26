@@ -8,9 +8,21 @@ shards:
     git: https://github.com/voobscout/cronic.git
     version: 0.1.0+git.commit.5d17c14fb084bd13586cbdc9bfbf838c5e414da6
 
+  crypto-secret:
+    git: https://github.com/didactic-drunk/crypto-secret.cr.git
+    version: 0.2.0+git.commit.388f4a3c7fb3c283ea5e99f918ff89e3d98f8626
+
   ed25519:
     git: https://github.com/spider-gazelle/ed25519.git
     version: 1.0.3+git.commit.48b3b2a73a54426d62be7a04b75d2da5abad80f0
+
+  mmap:
+    git: https://github.com/crystal-posix/mmap.cr.git
+    version: 0.4.0
+
+  mnemonic:
+    git: https://github.com/voobscout/mnemonic.cr.git
+    version: 0.1.0+git.commit.fb8c6222d6f4e0d67117615696302151ca206a1a
 
   number_parser:
     git: https://github.com/voobscout/number_parser.git
@@ -19,6 +31,10 @@ shards:
   progress_bar.cr:
     git: https://github.com/tpei/progress_bar.cr.git
     version: 0.3.1+git.commit.c6be630a1883bb12e61f537b38f30945ae795d5d
+
+  sodium:
+    git: https://github.com/voobscout/sodium.cr.git
+    version: 1.2.3+git.commit.85ec511161bf3d1809c28d8f2b2bb2b61ce91b5b
 
   tallboy:
     git: https://github.com/epoch/tallboy.git

@@ -1,6 +1,7 @@
 require "log"
 require "yaml"
 require "colorize"
+
 class String
   def colorize(hex : String) : Colorize::Object
     hex = hex.lstrip('#')
@@ -44,10 +45,27 @@ module Dkeygen
   VERSION = SHARD["version"]
   Log     = ::Log.for(SHARD["name"].to_s)
   Log.debug { "v#{VERSION} (Crystal #{Crystal::VERSION})" }
+
+  module TerminationHandler
+    @@handler_called = Atomic(Bool).new(false)
+
+    def self.cleanup
+      return if @@handler_called.swap(true)
+      CliCommonLogic::Tempdir.cleanup_all_tempdirs
+    end
+
+    def self.setup
+      [Signal::HUP, Signal::INT, Signal::TERM, Signal::QUIT].each do |sig|
+        sig.trap do
+          Log.error { "Received #{sig}, terminating..." }
+          cleanup
+          exit(128 + sig.value)
+        end
+      end
+      at_exit { cleanup }
+    end
+  end
 end
 
-at_exit do
-  Dkeygen::CliCommonLogic::Tempdir.cleanup_all_tempdirs
-end
-
+Dkeygen::TerminationHandler.setup
 require "./dkeygen/cli"

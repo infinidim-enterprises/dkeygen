@@ -21,6 +21,11 @@ dependencies:
   cronic:
     github: voobscout/cronic
     branch: master
+  # bip39:
+  #   github: q9f/bip39.cr
+  #   version: "~> 0.1"
+  # mnemonic:
+  #   github: voobscout/mnemonic.cr
 
 # development_dependencies:
 #   ameba:

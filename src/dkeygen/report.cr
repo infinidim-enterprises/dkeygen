@@ -6,6 +6,7 @@ module Dkeygen
     property gpg_public_key : String
     property ssh_public_key : String
     property gpg_revcert : String
+    property mnemonic : Array(String)?
 
     def initialize
       @gpg_key = uninitialized GpgKey
@@ -21,7 +22,7 @@ module Dkeygen
       commands = "gpg --import #{gpg_public_key}\n" +
                  "echo '#{gpg_key.fingerprint}:6:' | gpg --import-ownertrust\n" +
                  "echo '#{@gpg_key.keygrip}' >> \"$GNUPGHOME/sshcontrol\"\n" +
-                 "cat #{@ssh_public_key} >> \"$HOME/.ssh/authorized_keys\""
+                 "cat #{@ssh_public_key} >> \"$HOME/.ssh/authorized_keys\"\n"
 
       table = Tallboy.table do
         columns do
@@ -39,6 +40,7 @@ module Dkeygen
 
       puts table
       puts commands
+      puts "Mnemonic:\n#{self.mnemonic.try &.join(" ")}" if self.mnemonic
     end
   end
 end

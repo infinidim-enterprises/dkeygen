@@ -30,7 +30,8 @@
         findFirst
         optional
         isString
-        hasInfix;
+        hasInfix
+        filter;
 
       nixago_config = attrValues {
         githubsettings = {
@@ -223,16 +224,17 @@
           '';
         };
 
-        withStatic = drv: drv.overrideAttrs (o: {
-          configureFlags =
-            let
-              flags = o.configureFlags or [ ];
-              needsStatic =
-                !isString (findFirst (hasInfix "static") false flags) &&
-                drv.pname != "openssl";
-            in
-            flags ++ optional needsStatic "--enable-static";
-        });
+        withStatic = drv: drv.overrideAttrs
+          (o: {
+            configureFlags =
+              let
+                flags = o.configureFlags or [ ];
+                needsStatic =
+                  !isString (findFirst (hasInfix "static") false flags) &&
+                  drv.pname != "openssl";
+              in
+              flags ++ optional needsStatic "--enable-static";
+          });
 
         staticLibs = (map withStatic (with pkgs; [
           stdenv.cc.libc.static
@@ -240,14 +242,15 @@
           zlib.dev
           pcre2.dev
           libxml2.dev
-          openssl.dev
+          ((openssl.override { static = true; }).dev)
+          # openssl.dev
           libevent.dev
           boehmgc.dev
           libyaml.dev
 
           gmp.dev
           libz.dev
-          openssl.dev
+          libsodium.dev
         ]));
 
         libs = makeLibraryPath staticLibs;
@@ -279,6 +282,7 @@
 
             coreutils
             binutils
+            # libsodium
             pkg-config
 
             bip39key
@@ -331,8 +335,12 @@
       # overlays.default = composeManyExtensions (with self.overlays; [
       #   (final: prev: { dkeygen = final.callPackage ./nix/default.nix { }; })
       # ]);
-      overlays.sources = final: prev: { sources = final.callPackage ./nix/sources/generated.nix { }; };
-      overlays.bip39key = final: prev: { bip39key = final.callPackage ./nix/packages/bip39key { }; };
+      overlays.sources = final: prev: {
+        sources = final.callPackage ./nix/sources/generated.nix { };
+      };
+      overlays.bip39key = final: prev: {
+        bip39key = final.callPackage ./nix/packages/bip39key { };
+      };
       overlays.crystalline = final: prev: {
         crystalline = prev.crystalline.overrideAttrs (old: {
           inherit (final.sources.crystalline) src version;
@@ -345,7 +353,18 @@
           enableParallelBuilding = true;
           # ISSUE https://github.com/NixOS/nixpkgs/pull/380842
           # preCheck = old.preCheck + "\n" + "export LD_LIBRARY_PATH=${lib.makeLibraryPath nativeCheckInputs}:$LD_LIBRARY_PATH"
-          buildInputs = old.buildInputs or [ ] ++ [ final.libffi ];
+          buildInputs =
+            let
+              remove_openssl = filter (e: e.pname or "" != "openssl") old.buildInputs;
+            in
+            # openssl_legacy
+            remove_openssl ++ (with final; [ libffi openssl ]);
+
+          nativeBuildInputs = old.nativeBuildInputs or [ ] ++ [ final.openssl ];
+          CRYSTAL_LIBRARY_PATH = "${final.openssl.out}/lib";
+          CRYSTAL_INCLUDE_PATH = "${final.openssl.dev}/include";
+
+          # old.buildInputs or [ ] ++ (with final; [ libffi ]);
           makeFlags = old.makeFlags or [ ] ++ [ "interpreter=1" ];
         });
       };

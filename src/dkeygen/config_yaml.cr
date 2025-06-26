@@ -26,10 +26,10 @@ module Dkeygen
   class UserConfig
     include YAML::Serializable
 
-    property first_name : String | Nil
-    property last_name : String | Nil
-    property email : String | Nil
-    property mnemonic : String | Nil
+    property first_name : String?
+    property last_name : String?
+    property email : String?
+    property mnemonic : String?
   end
 
   class KeyConfig
