@@ -236,8 +236,9 @@
               flags ++ optional needsStatic "--enable-static";
           });
 
-        staticLibs = (map withStatic (with pkgs; [
-          stdenv.cc.libc.static
+        staticLibs = (map withStatic (with pkgs.pkgsMusl; [
+          stdenv.cc.libc
+          # .static
           libffi.dev
           zlib.dev
           pcre2.dev
@@ -258,10 +259,9 @@
       in
       {
         packages.default = self.packages.${system}.dkeygen-static;
-        packages.dkeygen = pkgs.callPackage ./nix/default.nix { inherit (pkgs_clean) crystal; };
-        packages.dkeygen-static = pkgs.callPackage ./nix/default.nix {
+        packages.dkeygen = pkgs.pkgsMusl.callPackage ./nix/default.nix { };
+        packages.dkeygen-static = pkgs.pkgsMusl.callPackage ./nix/default.nix {
           inherit staticLibs;
-          inherit (pkgs_clean) crystal;
           staticBinary = true;
         };
 
@@ -275,7 +275,7 @@
           devshell.startup.nixago_setup.text = (nixago.lib.${system}.makeAll nixago_config).shellHook;
           packages = with pkgs; [
             ameba
-            shards
+            pkgsMusl.shards
             crystal
             crystalline
             crystal2nix
@@ -349,7 +349,7 @@
         });
       };
       overlays.crystal = final: prev: {
-        crystal = prev.crystal.overrideAttrs (old: {
+        crystal = prev.pkgsMusl.crystal.overrideAttrs (old: {
           enableParallelBuilding = true;
           # ISSUE https://github.com/NixOS/nixpkgs/pull/380842
           # preCheck = old.preCheck + "\n" + "export LD_LIBRARY_PATH=${lib.makeLibraryPath nativeCheckInputs}:$LD_LIBRARY_PATH"
@@ -357,12 +357,11 @@
             let
               remove_openssl = filter (e: e.pname or "" != "openssl") old.buildInputs;
             in
-            # openssl_legacy
-            remove_openssl ++ (with final; [ libffi openssl ]);
+            remove_openssl ++ (with final.pkgsMusl; [ libffi openssl ]);
 
-          nativeBuildInputs = old.nativeBuildInputs or [ ] ++ [ final.openssl ];
-          CRYSTAL_LIBRARY_PATH = "${final.openssl.out}/lib";
-          CRYSTAL_INCLUDE_PATH = "${final.openssl.dev}/include";
+          nativeBuildInputs = old.nativeBuildInputs or [ ] ++ [ final.pkgsMusl.openssl ];
+          CRYSTAL_LIBRARY_PATH = "${final.pkgsMusl.openssl.out}/lib";
+          CRYSTAL_INCLUDE_PATH = "${final.pkgsMusl.openssl.dev}/include";
 
           # old.buildInputs or [ ] ++ (with final; [ libffi ]);
           makeFlags = old.makeFlags or [ ] ++ [ "interpreter=1" ];
