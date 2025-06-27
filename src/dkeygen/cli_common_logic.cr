@@ -108,6 +108,17 @@ module Dkeygen
 
       private def gpg_key_create
         Log.debug { "💡 gpg_key_create start" }
+
+        timestamp_args = [] of String
+
+        if timestamp = self.cmd_dump.timestamp
+          timestamp_args << "--creation-timestamp" << Cronic.parse(timestamp).to_unix.to_s
+        end
+
+        if expiry = self.cmd_dump.expiry
+          timestamp_args << "--expiration-timestamp" << Cronic.parse(expiry).to_unix.to_s
+        end
+
         uid = ["#{self.cmd_dump.key_config.user.first_name}",
                "#{self.cmd_dump.key_config.user.last_name}",
                "<#{self.cmd_dump.key_config.user.email}>"].reject(&.empty?)
@@ -117,7 +128,9 @@ module Dkeygen
                 "--input-filename",
                 "#{self.seed_file}",
                 "--output-filename",
-                "#{self.key_filename}"].concat(self.cmd_dump.key_config.bip39key.args)
+                "#{self.key_filename}"].
+               concat(timestamp_args).
+               concat(self.cmd_dump.key_config.bip39key.args)
 
         Log.debug { "#{args.inspect}" }
 

@@ -1,5 +1,4 @@
 { crystal
-, bip39key
 , runCommandNoCC
 , remarshal_0_17
 , lib
@@ -43,7 +42,7 @@ in
 crystal.buildCrystalPackage ((optionalAttrs staticBinary flags) // {
   inherit src shardsFile version pname format;
 
-  buildInputs = [ bip39key ] ++ staticLibs;
+  buildInputs = staticLibs;
   doInstallCheck = false;
 
   crystalBinaries.${pname} = {

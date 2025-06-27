@@ -256,9 +256,10 @@
       in
       {
         packages.default = self.packages.${system}.dkeygen-static;
-        packages.dkeygen = pkgs.callPackage ./nix/default.nix { inherit (pkgs_clean) crystal; };
+        packages.dkeygen = pkgs.callPackage ./nix/default.nix { inherit (pkgs_clean) crystal remarshal_0_17; };
         packages.dkeygen-static = pkgs.pkgsMusl.callPackage ./nix/default.nix {
           inherit staticLibs;
+          inherit (pkgs_clean.pkgsMusl) crystal;
           inherit (pkgs_clean) remarshal_0_17;
           staticBinary = true;
         };

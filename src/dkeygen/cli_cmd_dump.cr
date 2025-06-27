@@ -23,6 +23,8 @@ module Dkeygen
     property ykman : String? = Process.find_executable "ykman"
     property bip39key : String? = Process.find_executable "bip39key"
     property systemctl : String? = Process.find_executable "systemctl"
+    property timestamp : String?
+    property expiry : String?
 
     def initialize(**args)
       super(**args)
@@ -39,18 +41,29 @@ module Dkeygen
 
       add_argument "filename", description: "Secret key filename - will generate a new key if not provided", required: false
       add_option 'i', "interactions", description: "GnuPG interactions file in YAML format", type: :single
-      add_option 'c', "config", description: "PGP key configuration in YAML format", type: :single
+      add_option 'c', "config", description: "Key configuration in YAML format", type: :single
       add_option 'f', "force", description: "Don't confirm destructive operations", type: :none
       add_option 'o', "outdir", description: "Public keys and revocation certificate location", type: :single, default: File.expand_path("~/Documents/#{SHARD["name"]}", home: true)
+      add_option 't', "timestamp", description: "Key creation - parsed as UTC", type: :single
+      add_option 'e', "expiry", description: "Key expiry - parsed as UTC", type: :single
       add_option 'h', "help", description: "show usage"
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil
-      unless options.has? "help"
+      unless options.has?("help")
         @interactions = options.get?("interactions")
         @config = options.get?("config")
         @key_filename = arguments.get?("filename").to_s
         @outdir = options.get("outdir").to_s
+
+        unless arguments.has?("filename")
+          if timestamp = options.get?("timestamp")
+            @timestamp = timestamp.to_s
+          end
+          if expiry = options.get?("expiry")
+            @expiry = expiry.to_s
+          end
+        end
 
         Dir.mkdir_p(@outdir) unless File.exists?(@outdir)
 

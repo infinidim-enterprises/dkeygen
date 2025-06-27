@@ -16,8 +16,27 @@ module Dkeygen
     end
 
     def show
-      key_info = "#{gpg_key.user_ids.first.user_id_string}\n" +
-                 "#{gpg_key.fingerprint.colorize(:red)}"
+      timestamps = String::Builder.new
+
+      if created = gpg_key.primary_key.creation_date
+        timestamps << "\n" <<
+          "Created: '#{created}'" <<
+          " " << "[#{created.to_s("%s")}]"
+      end
+
+      if expires = gpg_key.primary_key.expiration_date
+        timestamps << " " <<
+          "Expires: '#{expires}'" <<
+          " " << "[#{expires.to_s("%s")}]"
+      else
+        timestamps << " " <<
+          "Expires: never"
+      end
+
+      key_info = "#{gpg_key.user_ids.first.user_id_string}" +
+                 " " +
+                 "[#{gpg_key.fingerprint.colorize(:red)}]" +
+                 timestamps.to_s
 
       commands = "gpg --import #{gpg_public_key}\n" +
                  "echo '#{gpg_key.fingerprint}:6:' | gpg --import-ownertrust\n" +
