@@ -1,3 +1,4 @@
+#+html: <a href="https://garnix.io"><img src="https://img.shields.io/endpoint.svg?url=https%3A%2F%2Fgarnix.io%2Fapi%2Fbadges%2Finfinidim-enterprises%2Fdkeygen%3Fbranch%3Dmaster"/></a>&nbsp;
 #+html: <a href="https://github.com/infinidim-enterprises/dkeygen/actions/workflows/release.yaml"><img src="https://img.shields.io/github/actions/workflow/status/infinidim-enterprises/dkeygen/release.yaml?event=push&logo=nixos&logoColor=white&label=master"/></a>&nbsp;
 #+html: <a href="https://github.com/infinidim-enterprises/dkeygen/issues"><img src="https://img.shields.io/github/issues/infinidim-enterprises/dkeygen"></a>&nbsp;
 #+html: <a href="https://github.com/infinidim-enterprises/dkeygen"><img src="https://img.shields.io/github/repo-size/infinidim-enterprises/dkeygen"></a>&nbsp;

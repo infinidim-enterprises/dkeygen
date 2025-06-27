@@ -1,4 +1,17 @@
 {
+  nixConfig = {
+    extra-substituters = [
+      "https://njk.cachix.org"
+      "https://cache.garnix.io"
+      "https://nix-community.cachix.org"
+    ];
+    extra-trusted-public-keys = [
+      "njk.cachix.org-1:ON4lemYq096ZfK5MtL1NU3afFk9ILAsEnXdy5lDDgKs="
+      "cache.garnix.io:CTFPyKSLcx5RMJKfLo5EEPUObbA78b0YQ2DTCJXqr9g="
+      "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs="
+    ];
+  };
+
   description = "(BIP39 mnemonic) Generate and/or Dump to OpenPGP card an ed25519 key";
 
   inputs.nixpkgs.url = "github:nixos/nixpkgs/nixpkgs-unstable";
@@ -34,6 +47,20 @@
         filter;
 
       nixago_config = attrValues {
+        garnix_io = {
+          output = "garnix.yaml";
+          format = "yaml";
+          hook.mode = "copy";
+          data = {
+            builds.branch = "master";
+            builds.include = [
+              "packages.aarch64-linux.*"
+              "packages.x86_64-linux.*"
+              "devShells.aarch64-linux.*"
+              "devShells.x86_64-linux.*"
+            ];
+          };
+        };
         githubsettings = {
           format = "yaml";
           output = ".github/settings.yml";
@@ -134,7 +161,6 @@
                   uses = "mxschmitt/action-tmate@master";
                   "if" = "\${{ failure() }}";
                   "with" = {
-                    # detached = true;
                     connect-timeout-seconds = 60 * 10;
                     limit-access-to-actor = true;
                   };
