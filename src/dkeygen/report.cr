@@ -2,6 +2,9 @@ require "tallboy"
 
 module Dkeygen
   class Report
+    include YAML::Serializable
+    include JSON::Serializable
+
     property gpg_key : GpgKey
     property gpg_public_key : String
     property ssh_public_key : String
@@ -15,6 +18,15 @@ module Dkeygen
       @gpg_revcert = uninitialized String
     end
 
+    def mnemonic_colorize
+      self.mnemonic.try &.map! do |word|
+        head = word[0, 4]
+        rest = word.size > 4 ? word[4..-1] : ""
+        "#{head.colorize(:light_red)}#{rest}"
+      end
+      self.mnemonic.try &.join(" ")
+    end
+
     def show
       timestamps = String::Builder.new
 
@@ -25,17 +37,17 @@ module Dkeygen
       end
 
       if expires = gpg_key.primary_key.expiration_date
-        timestamps << " " <<
+        timestamps << "\n" <<
           "Expires: '#{expires}'" <<
           " " << "[#{expires.to_s("%s")}]"
       else
-        timestamps << " " <<
+        timestamps << "\n" <<
           "Expires: never"
       end
 
       key_info = "#{gpg_key.user_ids.first.user_id_string}" +
                  " " +
-                 "[#{gpg_key.fingerprint.colorize(:red)}]" +
+                 "[#{gpg_key.fingerprint}]" +
                  timestamps.to_s
 
       commands = "gpg --import #{gpg_public_key}\n" +
@@ -59,7 +71,7 @@ module Dkeygen
 
       puts table
       puts commands
-      puts "Mnemonic:\n#{self.mnemonic.try &.join(" ")}" if self.mnemonic
+      puts "Mnemonic:\n#{mnemonic_colorize}" if self.mnemonic
     end
   end
 end

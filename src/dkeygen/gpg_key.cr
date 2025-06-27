@@ -1,5 +1,8 @@
 module Dkeygen
   class PrimaryKeyInfo
+    include YAML::Serializable
+    include JSON::Serializable
+
     getter type : String
     getter validity : Char
     getter key_length : Int32
@@ -30,6 +33,9 @@ module Dkeygen
   end
 
   class SubkeyInfo
+    include YAML::Serializable
+    include JSON::Serializable
+
     getter type : String
     getter validity : Char
     getter key_length : Int32
@@ -58,6 +64,9 @@ module Dkeygen
   end
 
   struct UserIdInfo
+    include YAML::Serializable
+    include JSON::Serializable
+
     getter type : String
     getter validity : Char
     getter user_id_string : String
@@ -75,6 +84,9 @@ module Dkeygen
   end
 
   class GpgKey
+    include YAML::Serializable
+    include JSON::Serializable
+
     getter primary_key : PrimaryKeyInfo
     getter user_ids : Array(UserIdInfo)
     getter subkeys : Array(SubkeyInfo)
@@ -91,7 +103,7 @@ module Dkeygen
       primary_key.keygrip
     end
 
-
+    # ameba:disable Metrics/CyclomaticComplexity
     def initialize(gpg_output : String)
       @user_ids = [] of UserIdInfo
       @subkeys = [] of SubkeyInfo

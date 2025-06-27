@@ -4,7 +4,7 @@ module Dkeygen
 
     property args : Array(String)
     property interactions : Array(Hash(String, String))
-    property meta : Hash(String, String)? = nil
+    property meta : Hash(String, String)?
   end
 
   class GpgExpectConfig
@@ -20,7 +20,7 @@ module Dkeygen
   class Bip39KeyConfig
     include YAML::Serializable
 
-    property args : Array(String)
+    property args : Array(String) = [] of String
   end
 
   class UserConfig
@@ -42,8 +42,8 @@ module Dkeygen
   class GpgHomeConfig
     include YAML::Serializable
 
-    property gpg_agent : String | Nil
-    property gpg : String | Nil
-    property scdaemon : String | Nil
+    property gpg_agent : String?
+    property gpg : String?
+    property scdaemon : String?
   end
 end

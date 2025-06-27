@@ -1,5 +1,6 @@
 require "log"
 require "yaml"
+require "json"
 require "colorize"
 
 class String

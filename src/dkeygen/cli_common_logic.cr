@@ -124,7 +124,7 @@ module Dkeygen
                "<#{self.cmd_dump.key_config.user.email}>"].reject(&.empty?)
 
         args = ["--user-id",
-                "'#{uid.join(" ")}'",
+                "#{uid.join(" ")}",
                 "--input-filename",
                 "#{self.seed_file}",
                 "--output-filename",
