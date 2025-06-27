@@ -31,7 +31,7 @@ Expected binaries on PATH:
 :END:
 Have a yubikey inserted.
 #+begin_src bash
-nix run "github:infinidim-enterprises/dkeygen#default" -- dump /path/to/private/key.asc
+nix run "github:infinidim-enterprises/dkeygen#default" -- --help
 #+end_src
 * TODO
 :PROPERTIES:
