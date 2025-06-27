@@ -44,6 +44,7 @@ module Dkeygen
       add_option 'c', "config", description: "Key configuration in YAML format", type: :single
       add_option 'f', "force", description: "Don't confirm destructive operations", type: :none
       add_option 'o', "outdir", description: "Public keys and revocation certificate location", type: :single, default: File.expand_path("~/Documents/#{SHARD["name"]}", home: true)
+      add_option 'j', "json", description: "JSON output", type: :none
       add_option 't', "timestamp", description: "Key creation - parsed as UTC", type: :single
       add_option 'e', "expiry", description: "Key expiry - parsed as UTC", type: :single
       add_option 'h', "help", description: "show usage"
@@ -73,7 +74,7 @@ module Dkeygen
         gpg_config
         binary_check
 
-        if Log.level.to_i >= 2
+        if Log.level.to_i >= 2 && !options.has?("json")
           @pb = ProgressBar.new(ticks: 10,
             charset: :bar,
             show_percentage: true)
@@ -98,7 +99,11 @@ module Dkeygen
         ssh_key_public_create
         @gpg_agent.toggle
 
-        @report.show
+        if options.has?("json")
+          puts @report.to_json
+        else
+          @report.show
+        end
       end
 
       true

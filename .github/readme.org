@@ -38,7 +38,7 @@ nix run "github:infinidim-enterprises/dkeygen#default" -- dump /path/to/private/
 :END:
 - sort out overlays.default
 - nitrokey support
-- json / yaml output
+- generate keys without external utilities
 * Remarks
 :PROPERTIES:
 :ID:       d5da8ae9-de21-466a-a084-32b598fbc289

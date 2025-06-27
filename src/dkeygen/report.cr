@@ -55,7 +55,7 @@ module Dkeygen
                  "echo '#{@gpg_key.keygrip}' >> \"$GNUPGHOME/sshcontrol\"\n" +
                  "cat #{@ssh_public_key} >> \"$HOME/.ssh/authorized_keys\"\n"
 
-      table = Tallboy.table do
+      table_info = Tallboy.table do
         columns do
           add "path"
           add "type"
@@ -69,7 +69,7 @@ module Dkeygen
               ["#{gpg_revcert}", "gpg revocation cert"]]
       end
 
-      puts table
+      puts table_info
       puts commands
       puts "Mnemonic:\n#{mnemonic_colorize}" if self.mnemonic
     end
