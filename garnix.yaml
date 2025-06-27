@@ -1,0 +1,7 @@
+builds:
+  branch: master
+  include:
+  - packages.aarch64-linux.*
+  - packages.x86_64-linux.*
+  - devShells.aarch64-linux.*
+  - devShells.x86_64-linux.*
