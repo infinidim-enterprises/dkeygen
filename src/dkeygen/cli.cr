@@ -17,8 +17,8 @@ module Dkeygen
     def setup : Nil
       @name = "dkeygen"
       @description = "Create and/or dump gpg keys to a hardware token"
-      add_option 'h', "help", description: "show usage"
-      add_option 'v', "version", description: "show version"
+      add_option 'h', "help", description: "Show usage"
+      add_option 'v', "version", description: "Show version"
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil

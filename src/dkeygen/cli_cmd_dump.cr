@@ -47,7 +47,7 @@ module Dkeygen
       add_option 'j', "json", description: "JSON output", type: :none
       add_option 't', "timestamp", description: "Key creation - parsed as UTC", type: :single
       add_option 'e', "expiry", description: "Key expiry - parsed as UTC", type: :single
-      add_option 'h', "help", description: "show usage"
+      add_option 'h', "help", description: "Show usage"
     end
 
     def run(arguments : Cling::Arguments, options : Cling::Options) : Nil

@@ -29,9 +29,9 @@ Expected binaries on PATH:
 :PROPERTIES:
 :ID:       c3535df0-f1c7-4387-a106-9ada05000b9d
 :END:
-Have a yubikey inserted.
+Have dependencies installed and a yubikey inserted.
 #+begin_src bash
-nix run "github:infinidim-enterprises/dkeygen#default" -- --help
+nix run --accept-flake-config "github:infinidim-enterprises/dkeygen#default" -- --help
 #+end_src
 * TODO
 :PROPERTIES:
