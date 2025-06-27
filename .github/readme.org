@@ -9,7 +9,7 @@
 :ID:       650a0770-4133-4709-bf72-30fee53b1172
 :END:
 - This software makes no guarantees of any kind!
-- It's meant to run on air-gapped systems, booted from a read-only media.
+- It's made to run on air-gapped systems, booted from a read-only media.
 * Usage
 :PROPERTIES:
 :ID:       4665a770-2464-41da-8d3d-b63ae34ad698
@@ -30,7 +30,7 @@ Expected binaries on PATH:
 :END:
 Have a yubikey inserted.
 #+begin_src bash
-nix run "github:infinidim-enterprises/dkeygen#dkeygen" -- dump /path/to/private/key.asc
+nix run "github:infinidim-enterprises/dkeygen#default" -- dump /path/to/private/key.asc
 #+end_src
 * TODO
 :PROPERTIES:
