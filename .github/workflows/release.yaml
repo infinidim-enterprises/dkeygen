@@ -63,5 +63,7 @@ jobs:
           runs-on: ubuntu-22.04-arm
 name: Release
 'on':
-  push: null
+  check_suite:
+    types:
+    - completed
   workflow_dispatch: null

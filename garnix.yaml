@@ -1,7 +1,9 @@
 builds:
   branch: master
   include:
-  - packages.aarch64-linux.*
-  - packages.x86_64-linux.*
+  - packages.aarch64-linux.dkeygen
+  - packages.aarch64-linux.dkeygen-static
+  - packages.x86_64-linux.dkeygen
+  - packages.x86_64-linux.dkeygen-static
   - devShells.aarch64-linux.*
   - devShells.x86_64-linux.*

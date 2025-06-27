@@ -54,8 +54,10 @@
           data = {
             builds.branch = "master";
             builds.include = [
-              "packages.aarch64-linux.*"
-              "packages.x86_64-linux.*"
+              "packages.aarch64-linux.dkeygen"
+              "packages.aarch64-linux.dkeygen-static"
+              "packages.x86_64-linux.dkeygen"
+              "packages.x86_64-linux.dkeygen-static"
               "devShells.aarch64-linux.*"
               "devShells.x86_64-linux.*"
             ];
@@ -94,15 +96,15 @@
           hook.mode = "copy";
           data = {
             name = "Release";
-            on.push = null;
+            # on.push = null;
             on.workflow_dispatch = null;
+            on.check_suite.types = [ "completed" ];
             jobs.make_release_bin = {
               runs-on = "\${{ matrix.runs-on }}";
               strategy.matrix.include = [
                 { runs-on = "ubuntu-22.04"; arch = "x86_64-linux"; }
                 { runs-on = "ubuntu-22.04-arm"; arch = "aarch64-linux"; }
               ];
-
               steps = [
                 {
                   name = "⬆ Checkout";
