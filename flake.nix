@@ -238,20 +238,17 @@
 
         staticLibs = (map withStatic (with pkgs.pkgsMusl; [
           stdenv.cc.libc
-          # .static
           libffi.dev
           zlib.dev
           pcre2.dev
           libxml2.dev
           ((openssl.override { static = true; }).dev)
-          # openssl.dev
           libevent.dev
           boehmgc.dev
           libyaml.dev
 
           gmp.dev
           libz.dev
-          libsodium.dev
         ]));
 
         libs = makeLibraryPath staticLibs;
