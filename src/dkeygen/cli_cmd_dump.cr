@@ -75,7 +75,7 @@ module Dkeygen
         binary_check
 
         if Log.level.to_i >= 2 && !options.has?("json")
-          @pb = ProgressBar.new(ticks: 10,
+          @pb = ProgressBar.new(ticks: 11,
             charset: :bar,
             show_percentage: true)
           @pb.try &.init
@@ -89,6 +89,7 @@ module Dkeygen
 
         @gpg_agent.toggle
         gpg_key_import_or_generate
+        gpg_key_setpref
         gpg_key_revcert
         gpg_key_public_export
         overrides
@@ -342,6 +343,22 @@ module Dkeygen
           pb_tick("Set card owner information")
         else
           Log.error { "card_set_owner failure" }
+        end
+      end
+    end
+
+    private def gpg_key_setpref
+      if @gpg
+        @gpg_interactions.key_setpref.args << "#{@gpg_key.fingerprint}"
+        Log.trace { "@gpg_interactions.key_setpref.args: #{@gpg_interactions.key_setpref.args.inspect}" }
+        Log.trace { "@gpg_interactions.key_setpref.interactions: #{@gpg_interactions.key_setpref.interactions.inspect}" }
+        Log.debug { "💡 key_setpref start" }
+        res = Expect.interactive_process @gpg.to_s, @gpg_interactions.key_setpref, @env_vars
+        if res[:status].success? || res[:status].exit_code != 1
+          Log.debug { "#{"✓".colorize(:green)} key_setpref success" }
+          pb_tick("Set key preferences")
+        else
+          Log.error { "key_setpref failure" }
         end
       end
     end

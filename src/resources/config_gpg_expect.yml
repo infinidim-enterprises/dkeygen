@@ -104,6 +104,27 @@ key_revcert:
     - pattern: "ask_revocation_reason.okay"
       response: "y"
 
+key_setpref:
+  args:
+    - "--edit-key"
+    - "--pinentry-mode"
+    - "loopback"
+    - "--command-fd=0"
+    - "--status-fd=1"
+    - "--no-tty"
+
+  interactions:
+    - pattern: "keyedit.prompt"
+      response: "cross-certify"
+    - pattern: "keyedit.prompt"
+      response: "setpref AES256 AES192 AES CAST5 SHA512 SHA384 SHA256 SHA224 ZLIB BZIP2 ZIP Uncompressed"
+    - pattern: "keyedit.setpref.okay"
+      response: "y"
+    - pattern: "keyedit.prompt"
+      response: "quit"
+    - pattern: "keyedit.save.okay"
+      response: "y"
+
 key_keytocard:
   args:
     - "--edit-key"

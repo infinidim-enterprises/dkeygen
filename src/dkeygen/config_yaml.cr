@@ -14,6 +14,7 @@ module Dkeygen
     property card_set_keyattrs : GpgCommandConfig
     property card_set_owner : GpgCommandConfig
     property key_keytocard : GpgCommandConfig
+    property key_setpref : GpgCommandConfig
     property key_revcert : GpgCommandConfig
   end
 
